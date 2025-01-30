@@ -54,14 +54,15 @@ void restoration(FILE *input)
 
                 correct_atom = (char*) Seq_get(atom_sequence, index);
 
-                int size_matrix = Seq_length(matrix);
+                int size_original_matrix = Seq_length(matrix);
                 false_lines = Seq_length(matrix) - 2;
 
-                matrix = correct_matrix(matrix, size_matrix, index);
+                width = Seq_length(Seq_get(matrix, index));
+
+                matrix = correct_matrix(matrix, size_original_matrix, index, width);
 
                 //printf("Seq_length(Seq_get(matrix, 0)): %d\n", Seq_length(Seq_get(matrix, 0)));
                 assert(Seq_length(Seq_get(matrix, 0)) == Seq_length(Seq_get(matrix, 1)));
-                width = Seq_length(Seq_get(matrix, 0));
 
                 //printf("%s", "The matrix after discovering the first correct 2 indices\n");
                 //printing_matrix_to_file(matrix, "out.pgm");
@@ -100,7 +101,7 @@ void restoration(FILE *input)
     
     // printf("\n");
     // printf("%s", "Final matrix\n");
-    printing_matrix_to_file(matrix, "out.pgm");
+    printing_matrix(matrix, width, heigth);
 
     for (int i = 0; i < Seq_length(matrix); i++) {
         Seq_T row = Seq_get(matrix, i);

@@ -17,11 +17,12 @@ int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix,
                                                 int width);
 int separate(const char* line, Seq_T newRow, char* atom_val);
 int check_atoms(Seq_T atom_sequence, const char* atom);
-Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index);
+Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index, int width);
 
 //For testing
-void printing_matrix_to_file(Seq_T matrix, const char *filename);
-void printing_atom_seq(Seq_T row);
+void printing_matrix(Seq_T matrix, int width, int heigth);
+Seq_T writeRowToBinary(Seq_T seq, int width);
+// void printing_atom_seq(Seq_T row);
 
 int construct_injected_sequence(const char* line, char* atom_val);
 void construct_newRow(const char* line, Seq_T newRow);

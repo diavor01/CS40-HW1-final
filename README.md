@@ -1,5 +1,6 @@
 # CS-40-HW1
 Darius-Stefan Iavorschi (diavor01)
+Alijah Jackson (ajacks11)
 ->
 
 filesofpix Assignment
@@ -39,6 +40,7 @@ File Descriptions:
 -> readaline.c and its header file: reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
 -> functions.c and its header file: represent helper functions for the restoration function
 -> restoration.c and its header file: the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
+-> conversion.c and its header file: helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format pgm file
 
 Architecture:
 For readaline, we will be using a pointer to char called buffer to store the characters. Buffer stops receiving input when finding the endline character. 

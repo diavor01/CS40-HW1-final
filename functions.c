@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <ctype.h>
 #include <assert.h>
 
@@ -109,7 +110,7 @@ int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix,
 
         /* Adding the data to the matrix
         */  
-        Seq_addhi(matrix, newRow);
+        Seq_addhi(matrix, writeRowToBinary(newRow, width));
     } else {
         fl++;
     }
@@ -362,12 +363,12 @@ int check_atoms(Seq_T atom_sequence, const char* atom)
  * returns:   the index at which the pair of identical atoms was found (the index of the other atom is already known: Seq_length(atom_sequence) - 1). If it could not be found, returns -1
  * Author: Darius-Stefan Iavorschi
  */
-Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index)
+Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index, int width)
 {
     // 1. Build the new matrix with the two “correct” rows
-    Seq_T new_matrix = Seq_seq(Seq_get(matrix, index),
-                               Seq_get(matrix, size_matrix - 1),
-                               NULL);
+    Seq_T new_matrix = Seq_seq(writeRowToBinary(Seq_get(matrix, index), width), 
+                        writeRowToBinary(Seq_get(matrix, size_matrix - 1), width),
+                        NULL);
 
     // 2. Free all other rows
     //    (Don’t free the rows at index and size_matrix-1 
@@ -392,52 +393,161 @@ Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index)
 }
 
 
-
-// For testing purposes
-void printing_matrix_to_file(Seq_T matrix, const char *filename)
+void printing_matrix(Seq_T matrix, int width, int height)
 {
-    FILE *file = fopen(filename, "w"); // Open file in write mode
-    if (file == NULL) {
-        printf("Error opening file: %s\n", filename);
-        return;
-    }
+ 
+    printf("P5\n");
+    printf("%d %d\n", width, height);
+    printf("255\n");
 
-    for (size_t i = 0; i < (size_t)Seq_length(matrix); i++) {
-        Seq_T row = (Seq_T)Seq_get(matrix, i);
-        for (size_t j = 0; j < (size_t)Seq_length(row); j++) {
-            int *num_ptr = (int *)Seq_get(row, j);
-            if (num_ptr) {
-                printf("%d", *num_ptr);
+    for (int row = 0; row < height; row++) {
+        Seq_T byte_seq = (Seq_T)Seq_get(matrix, row);
+
+        for (int col = 0; col < width; col++) {
+            // Each element in byte_seq is an unsigned char*, so retrieve it:
+            unsigned char *byte_ptr = Seq_get(byte_seq, col);
+            if (byte_ptr) {
+                putchar(*byte_ptr);
             } else {
-                printf("NULL");
-            }
-            // Print a space if it's not the last element in the row
-            if (j + 1 < (size_t)Seq_length(row)) {
-                printf(" ");
+
+                fprintf(stderr, "Could not read byte_ptr");
             }
         }
-        printf("\n"); // End row with newline
     }
-
-
-    // fprintf(file, "create_P2_file was successful\n");
-    fclose(file); // Close the file
 }
 
-void printing_atom_seq(Seq_T atom_sequence)
+
+// Function to write a row of pixels to binary file
+Seq_T writeRowToBinary(Seq_T seq, int width)
 {
-    printf("Printing the atom_sequence: \n");
-    for (size_t j = 0; j < (size_t)Seq_length(atom_sequence); j++) 
-    {
-        char *str = Seq_get(atom_sequence, j);
-        if (str) {
-            printf("%s", str);
-        } else {
-            printf("NULL ");
-        }
+    if (seq == NULL) {
+        fprintf(stderr, "Error: Invalid input to writeRowToBinary\n");
+        return NULL;
     }
-    printf("\n");
+
+    Seq_T byte_seq = Seq_new(0);
+
+    for (int i = 0; i < width; i++) {
+        int value = (int)(intptr_t)Seq_get(seq, i);
+
+        unsigned char byte_value = (unsigned char)value;
+
+        /* Allocate storage for one byte and store it */
+        unsigned char *stored_val = malloc(sizeof(*stored_val));
+        *stored_val = byte_value;
+
+        /* Add pointer to that single byte to the sequence */
+        Seq_addhi(byte_seq, stored_val);
+    }
+
+    return byte_seq;
 }
 
+
+
+
+// void printing_atom_seq(Seq_T atom_sequence)
+// {
+//     printf("Printing the atom_sequence: \n");
+//     for (size_t j = 0; j < (size_t)Seq_length(atom_sequence); j++) 
+//     {
+//         char *str = Seq_get(atom_sequence, j);
+//         if (str) {
+//             printf("%s", str);
+//         } else {
+//             printf("NULL ");
+//         }
+//     }
+//     printf("\n");
+// }
+// void writeP5Header(const char *filename, int width, int height) {
+//     assert(width > 0);
+//     assert(height > 0);
+//     assert(filename != NULL);
+
+//     FILE *file = fopen(filename, "rb+");
+//     if (!file) {
+//         perror("Failed to open file");
+//         exit(EXIT_FAILURE);
+//     }
+
+//     // Move the existing contents to make room for the header
+//     fseek(file, 0, SEEK_END);
+//     long fileSize = ftell(file);
+//     char *buffer = (char *)malloc(fileSize);
+//     if (buffer == NULL) {
+//         perror("Memory allocation error");
+//         fclose(file);
+//         exit(EXIT_FAILURE);
+//     }
+
+//     fseek(file, 0, SEEK_SET);
+//     fread(buffer, 1, fileSize, file);
+
+//     fseek(file, 0, SEEK_SET);
+
+//     fprintf(file, "P5\n%d %d\n255\n", width, height);
+//     fwrite(buffer, 1, fileSize, file);
+
+//     free(buffer);
+//     fclose(file);
+// }
+// Function to trim leading and trailing whitespace from a string
+// void trim_whitespace(char *str) {
+//     char *end;
+
+//     // Trim leading space
+//     while (isspace((unsigned char)*str)) str++;
+
+//     if (*str == 0) { // All spaces?
+//         return;
+//     }
+
+//     // Trim trailing space
+//     end = str + strlen(str) - 1;
+//     while (end > str && isspace((unsigned char)*end)) end--;
+
+//     // Write new null terminator
+//     end[1] = '\0';
+// }
+
+// Function to convert a line into a sequence of numbers
+// Seq_T convert_line_to_sequence(const char *line) {
+//     if (line == NULL) {
+//         return NULL;
+//     }
+
+//     Seq_T sequence = Seq_new(0);
+//     if (sequence == NULL) {
+//         return NULL;
+//     }
+
+//     // Calculate length and allocate memory for copy
+//     size_t len = strlen(line) + 1;
+//     char *copy = malloc(len);
+//     if (copy == NULL) {
+//         Seq_free(&sequence);
+//         return NULL;
+//     }
+
+//     // Copy the input line to avoid modifying the original string
+//     strcpy(copy, line);
+
+//     // Use sscanf to read numbers directly from the string
+//     char *ptr = copy;
+//     int number;
+//     while (sscanf(ptr, "%d", &number) == 1) {
+//         Seq_addhi(sequence, (void *)(intptr_t)number);
+
+//         // Move ptr to the next non-whitespace character after the last number
+//         while (*ptr && !isspace((unsigned char)*ptr)) ptr++;
+//         while (*ptr && isspace((unsigned char)*ptr)) ptr++;
+//     }
+
+//     // Free the copied string memory
+//     free(copy);
+
+//     return sequence;
+// }
 
 

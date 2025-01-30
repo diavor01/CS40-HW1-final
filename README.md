@@ -5,7 +5,6 @@ Alijah Jackson (ajacks11)
 
 filesofpix Assignment
 
-
 Problem Statement: 
   Extracting image data from the corrupted files by identifying and separating the legitimate rows to reconstruct the uncurrpted image
 
@@ -63,12 +62,12 @@ Implementations:
 
   restoration- this is the main function for handling of both decrypting and outputing the uncorruted pgm images. In this file we use readaline to process a corrupted file line by line, storing numbers in matrix_nums and characters in atoms, leveraging pointer equality to identify duplicate sequences. Once duplicates are found, we restore the original PGM file by filtering lines with the correct sequence, converting the data, and outputting it in PGM format with the appropriate header and binary content.
   
-  writeToBinary- the writeToBinary function reads the characters from the sequence of characters and converts them to bytes that can outputted. This method is called multiple times over a conversion as it prints it line by line to stdout.
+  writeToBinary- the writeToBinary function reads the characters from the sequence of characters and converts them to bytes that can outputted. This method is called multiple times over a conversion as it adds it to the correct matrix of btyes
   
   Tests:
   
    - The readaline function will be tested using diff for each corrupted file provided. Additional files will be provided to test each expected error. After that, we will try using larger pgm files (width>1000).
-   - 
+     
 
   
   

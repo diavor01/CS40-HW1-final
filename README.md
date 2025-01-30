@@ -68,9 +68,16 @@ Implementations:
   
    - The readaline function will be tested using diff for each corrupted file provided. Additional files will be provided to test each expected error. After that, we will try using larger pgm files (width>1000).
      
+   - Diff can be used on original p5 formatted files to compare the converted uncorrupted image vs the uncorrupted image that went through no processing. If no results show that means the files are identical
 
-  
-  
+   - We test reading lines from a file or standard input by providing various inputs (standard strings, empty files, long lines, and null arguments) for the purpose of ensuring the readaline function correctly reads lines, handles edge cases, and reports errors appropriately.
 
+  -  We test atom handling by providing sequences of atoms and lines with mixed numbers and characters for the purpose of ensuring the program correctly identifies existing atoms, extracts injected sequences, and handles non-existing atoms.
 
+  -  We test number and character separation by providing lines with mixed numbers, only numbers, only characters, and empty lines for the purpose of ensuring the program correctly separates numbers and characters and stores them in appropriate data structures.
 
+  - We test matrix construction by providing lines with mixed numbers and characters, as well as invalid data (e.g., negative numbers, numbers exceeding the max grayscale value) for the purpose of ensuring the program correctly constructs rows of numbers and handles edge cases gracefully.
+
+  - We test file restoration by providing corrupted PGM files, large files, and edge cases (empty files, files with only headers, and files with invalid data) for the purpose of ensuring the program correctly restores the files, handles large inputs efficiently, and produces appropriate error messages or output.
+
+  - We test file restoration accuracy by comparing restored files with original uncorrupted files using diff for the purpose of ensuring the restored files are identical to the originals and the program works as expected.

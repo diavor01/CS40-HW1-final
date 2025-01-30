@@ -35,11 +35,11 @@ Hanson's data abstractions used and their purposes:
    Purpose: -> they allow for atom equality, which is essential for comparing the injected sequences
    
 File Descriptions:
--> main.c: checks the type of input received and passes it on to the restoration function
--> readaline.c and its header file: reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
--> functions.c and its header file: represent helper functions for the restoration function
--> restoration.c and its header file: the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
--> conversion.c and its header file: helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format
+-  main.c: checks the type of input received and passes it on to the restoration function
+-  readaline.c and its header file: reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
+-  functions.c and its header file: represent helper functions for the restoration function
+-  restoration.c and its header file: the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
+-  conversion.c and its header file: helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format
 
 Architecture:
 For readaline, we will be using a pointer to char called buffer to store the characters. Buffer stops receiving input when finding the endline character. 

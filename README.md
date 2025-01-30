@@ -7,26 +7,26 @@ filesofpix Assignment
 
 
 Problem Statement: 
-  Extracting original image data from the corrupted files by identifying and separating the legitimate rows.
+  Extracting image data from the corrupted files by identifying and separating the legitimate rows to reconstruct the uncurrpted image
 
 Use Cases: 
-  Restore a corrupted PGM file by identifying valid image rows and discarding injected ones.
-  Validate input files for structural integrity.
-  Efficiently read files containing arbitrary-length lines
+  -> Restore a corrupted PGM file by identifying valid image rows and discarding injected ones.
+  -> Validate input files for structural integrity.
+  -> Efficiently read files containing arbitrary-length lines
 
 Assumptions:
   Input - 
-    Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
-    Images are atleast a 2x2 grid
-    The input can come from both stdin or from a file
+    -> Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
+    -> Images are atleast a 2x2 grid
+    -> The input can come from both stdin or from a file
   Corruption -
-    The corrupted images originate from "plain" PGM files(P2)
-    Each original row is terminated by a newline character (\n) that remains unchanged.
-    Corruption does not alter the row order but adds extra rows
+    -> The corrupted images originate from "plain" PGM files(P2)
+    -> Each original row is terminated by a newline character (\n) that remains unchanged.
+    -> Corruption does not alter the row order but adds extra rows
   
 Constraints:
-  The restoration program should process even large images efficiently under 20 seconds
-  Hanson’s data structures are available and must be used when appropriate(except for arrays)
+  -> The restoration program should process even large images efficiently under 20 seconds
+  -> Hanson’s data structures are available and must be used when appropriate(except for arrays)
 
 Hanson's data abstractions used and their purposes:
 1) Sequences
@@ -53,19 +53,20 @@ Now that we know the correct sequence of characters with which the original line
 
 Once we have the correct sequence of lines along with the dimensions of the file, this sequence is passed to the conversion process and output to stdout as the PGM header with the magic number, dimensions, and max grayscale value followed by the content of the file expressed by single bites as opposed to individual character in the P2 format.
 
-
 Data structures used:
 Seq_T atom_sequence: Represents a sequence of atoms. The first step is establishing the correct sequence of characters the original lines have been injected with. We add a new atom to the sequence until we find identical atoms.
 Seq_T newRow: representing a sequence of numbers...
 Seq_T: representing a sequence of newRows
 
-
 Implementations:
-  readaline- The readaline function reads characters one by one from the input file and stores them in a buffer (the buffer is allocated dynamically so that its size can change). The loop stops if it encounters the endline character or the end of the file. Then *datapp gets updated and the size of the buffer is returned. If the size is 0 (meaning we no characters have been read, and thus we reached the end of the line), the buffer is freed and the function returns 0.
+  readaline- The readaline function reads characters one by one from the input file and stores them in a buffer (the buffer is allocated dynamically so that its size can change). The loop stops if it encounters the endline character or the end of the file. Then *datapp gets updated and the size of the buffer is returned. If the size is 0 (meaning we no characters have been read, and thus we reached the end of the line), the buffer is freed and the function returns 0
+
+  restoration- this is the main function for handling of both decrypting and outputing the uncorruted pgm images. In this file we use readaline to process a corrupted file line by line, storing numbers in matrix_nums and characters in atoms, leveraging pointer equality to identify duplicate sequences. Once duplicates are found, we restore the original PGM file by filtering lines with the correct sequence, converting the data, and outputting it in PGM format with the appropriate header and binary content.
   
-  writeToBinary- the writeToBinary function reads the characters from the sequence of characters and converts them to bytes that can outputted. This method is called multiple times over a conversion as it prints it line by line 
+  writeToBinary- the writeToBinary function reads the characters from the sequence of characters and converts them to bytes that can outputted. This method is called multiple times over a conversion as it prints it line by line to stdout.
   
   Tests:
+  
    - The readaline function will be tested using diff for each corrupted file provided. Additional files will be provided to test each expected error. After that, we will try using larger pgm files (width>1000).
    - 
 

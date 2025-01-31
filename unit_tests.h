@@ -1,6 +1,6 @@
-#include <unistd.h>  // Add this for `fork()` and `pid_t`
-#include <sys/types.h>  // For `pid_t`
-#include <sys/wait.h>   // For `waitpid()`
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -10,11 +10,10 @@
 #include "readaline.h"
 #include "seq.h"
 
+
 void test_check_atoms() {
-    // Create a new sequence
     Seq_T atom_sequence = Seq_new(7);
 
-    // Add atoms to the sequence
     const char *atom1 = Atom_new("Zn", 2);
     const char *atom2 = Atom_new("Cu", 2);
     const char *atom3 = Atom_new("Ni", 2);
@@ -29,26 +28,17 @@ void test_check_atoms() {
     assert(check_atoms(atom_sequence, atom4) == -1);
     Seq_addhi(atom_sequence, (void *)atom4);
 
-    printf("Sequence length: %d\n", Seq_length(atom_sequence));
-    for (int i = 0; i < Seq_length(atom_sequence); i++) {
-        printf("Seq[%d]: %p\n", i, (void *)Seq_get(atom_sequence, i));
-    }
-
-
     // Check for atom that does exist
     const char *atom5 = Atom_new("Mg", 2);
     Seq_addhi(atom_sequence, (void *)atom5);
 
     printf("Atom 5: %p\n", (void *)atom5);
 
-    // printf("%d\n", check_atoms(atom_sequence, atom5));
 
     assert(check_atoms(atom_sequence, atom5) == 3);    
 
-    // Cleanup
     Seq_free(&atom_sequence);
 
-    // If all assertions pass
     printf("All tests passed.\n");
 }
 
@@ -60,11 +50,6 @@ void test_diff_nums_chars1()
 
 
     diff_nums_chars1(line1, matrix, atom_sequence);
-    printf("Printing the number matrix\n");
-    printing_matrix_to_file(matrix, "out.pgm");
-    printf("Printing the atom_sequence\n");
-    printing_atom_seq(atom_sequence);
-    printf("\n");
 }
 
 void test_separate_extended()
@@ -172,16 +157,39 @@ void test_construct_newRow()
 }
 
 
-#define TEST_STRING_1 "Hello, World!\n"
 #define TEST_STRING_2 "Line 2 with some text.\n"
 #define TEST_STRING_3 "Hell\0\0Wor\0d!\n"
 #define TEST_STRING_4 "255 255 255 255 255 255 255 255 255 247 175 100 114 120 121 128 134 138 145 150 153 156 160 163 165 167 171 173 174 175 176 177 181 181 182 183 184 185 185 186 190 191 126 25 40 33 77 126 163 180 187 191 193 192 195 194 193 194 195 195 196 198 197 194 196 197 197 197 196 196 197 198 195 196 197 197 197 196 196 195 195 197 196 196 197 195 194 196 196 193 195 197 194 192 193 193 193 189 189 180 163 136 85 39 39 20 107 183 194 184 185 187 184 183 182 181 180 179 177 176 177 174 172 169 168 166 163 161 158 153 149 143 138 136 130 122 116 116 98 189 247 253 254 255 255 255 255 255 255 255\n"
 
 
-void test_readaline_basic() {
+//Testing the readaline function
+void test_readaline_basic1() {
     printf("Running test: test_readaline_basic\n");
     
-    FILE *tmp = tmpfile();  // Create a temporary file
+    FILE *tmp = tmpfile();  // Creating a temporary file
+    assert(tmp != NULL);
+
+    fputs(TEST_STRING_2, tmp);
+    rewind(tmp);
+    char *line = NULL;
+    size_t len;
+
+    len = readaline(tmp, &line);
+
+    printf("len: %zu\n", len);
+    printf("strlen(TEST_STRING_4): %zu\n", strlen(TEST_STRING_2));
+    assert(len == strlen(TEST_STRING_2));
+    assert(strcmp(line, TEST_STRING_2) == 0);
+    free(line);
+
+    fclose(tmp);
+    printf("test_readaline_basic passed!\n");
+}
+
+void test_readaline_basic2() {
+    printf("Running test: test_readaline_basic\n");
+    
+    FILE *tmp = tmpfile();  // Creating a temporary file
     assert(tmp != NULL);
 
     fputs(TEST_STRING_4, tmp);
@@ -192,9 +200,9 @@ void test_readaline_basic() {
     len = readaline(tmp, &line);
 
     printf("len: %zu\n", len);
-    printf("strlen(TEST_STRING_4): %zu\n", strlen(TEST_STRING_4));
-    assert(len == strlen(TEST_STRING_4));   // Ensure correct length
-    assert(strcmp(line, TEST_STRING_4) == 0); // Ensure correct content
+    printf("strlen(TEST_STRING_4): %d\n", 12);
+    assert(len == strlen(TEST_STRING_4));
+    assert(strcmp(line, TEST_STRING_4) == 0);
     free(line);
 
     fclose(tmp);
@@ -202,27 +210,27 @@ void test_readaline_basic() {
 }
 
 
-// void test_readaline_NULL_chars() {
-//     printf("Running test: test_readaline_NULL_chars\n");
+void test_readaline_NULL_chars() {
+    printf("Running test: test_readaline_NULL_chars\n");
     
-//     FILE *tmp = tmpfile();  // Create a temporary file
-//     assert(tmp != NULL);
+    FILE *tmp = tmpfile();
+    assert(tmp != NULL);
 
-//     fputs(TEST_STRING_3, tmp);
-//     rewind(tmp);  // Reset file pointer to beginning
+    fputs(TEST_STRING_3, tmp);
+    rewind(tmp);
 
-//     char *line = NULL;
-//     size_t len;
+    char *line = NULL;
+    size_t len;
 
-//     len = readaline(tmp, &line);
-//     printf("len: %zu\n", len);
-//     assert(len == 13);   // Ensure correct length
-//     assert(memcmp(line, TEST_STRING_3, 13) == 0); // Ensure correct content
-//     free(line);
+    len = readaline(tmp, &line);
+    printf("len: %zu\n", len);
+    assert(len == 13);
+    assert(memcmp(line, TEST_STRING_3, 13) == 0);
+    free(line);
   
-//     fclose(tmp);
-//     printf("test_readaline_basic passed!\n");
-// }
+    fclose(tmp);
+    printf("test_readaline_basic passed!\n");
+}
 
 void test_readaline_empty_file() {
     printf("Running test: test_readaline_empty_file\n");
@@ -242,15 +250,14 @@ void test_readaline_empty_file() {
 void test_readaline_too_long() {
     printf("Running test: test_readaline_too_long\n");
 
-    // Create a dynamically allocated 1100-character string
-    size_t long_length = 1101;  // Exceeds 1000
+    size_t long_length = 1101;
     char *long_string = malloc(long_length);
     assert(long_string != NULL);
 
-    memset(long_string, 'A', long_length);  // Fill with 'A'
-    long_string[long_length] = '\n';  // Add a newline
+    memset(long_string, 'A', long_length);
+    long_string[long_length] = '\n';
 
-    // Write it to a temporary file
+
     FILE *tmp = tmpfile();
     assert(tmp != NULL);
     fputs(long_string, tmp);
@@ -258,7 +265,6 @@ void test_readaline_too_long() {
 
     char *line = NULL;
 
-    // Fork to catch program exit (error handling test)
     pid_t pid = fork();
     if (pid == 0) {
         readaline(tmp, &line);  // Should cause an error & exit
@@ -267,8 +273,8 @@ void test_readaline_too_long() {
 
     int status;
     waitpid(pid, &status, 0);
-    assert(WIFEXITED(status));  // Ensure child process exited
-    assert(WEXITSTATUS(status) != 0);  // Ensure it exited with failure
+    assert(WIFEXITED(status));
+    assert(WEXITSTATUS(status) != 0); 
 
     free(long_string);
     fclose(tmp);
@@ -284,10 +290,9 @@ void test_readaline_null_argument() {
 
     char *line = NULL;
 
-    // Should exit, but we'll use assert to simulate behavior
     if (fork() == 0) {
-        readaline(NULL, &line);
-        exit(1);  // If it doesn't exit, we fail
+        readaline(NULL, &line); // Should cause an error & exit
+        exit(1);  // If we reach here, the test failed
     }
     
     if (fork() == 0) {
@@ -329,14 +334,8 @@ void test_construct_injected_sequence()
         int len = 
             construct_injected_sequence(test_cases[i].line, atom_val);
 
-        // printf("len: %d\n", len);
-        // printf("test_cases[i].expected_atom_len: %d\n\n", test_cases[i].expected_atom_len);
-
         assert(len == test_cases[i].expected_atom_len);
         assert(memcmp(atom_val, test_cases[i].expected_atom, len) == 0);
-
-        // printf("Seq_length(newRow): %d\n", Seq_length(newRow));
-        // printf("test_cases[i].expected_seq_count: %d\n", test_cases[i].expected_seq_count);
 
         free(atom_val);
 
@@ -344,6 +343,3 @@ void test_construct_injected_sequence()
         printf("\n");
     }
 }
-
-
-

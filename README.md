@@ -1,12 +1,12 @@
 # CS-40-HW1
 Darius-Stefan Iavorschi (diavor01)
 Alijah Jackson (ajacks11)
-->
+
 
 filesofpix Assignment
 
 **Problem Statement:** 
-  Extracting image data from the corrupted files by identifying and separating the legitimate rows to reconstruct the uncurrpted image
+  Extracting image data from the corrupted files by identifying and separating the legitimate rows to reconstruct the uncorrupted image
 
 **Use Cases:** 
 -  Restore a corrupted PGM file by identifying valid image rows and discarding injected ones.
@@ -16,7 +16,7 @@ filesofpix Assignment
 **Assumptions:**
 -  Input:
   -  Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
-  - Images are atleast a 2x2 grid
+  - Images are at least a 2x2 grid
   - The input can come from both stdin or from a file
 -  Corruption:
   -    The corrupted images originate from "plain" PGM files(P2)
@@ -24,7 +24,7 @@ filesofpix Assignment
   -    Corruption does not alter the row order but adds extra rows
   
 **Constraints:**
--  The restoration program should process even large images efficiently under 20 seconds
+-  The restoration program should process even large images efficiently in under 20 seconds
 -  Hanson’s data structures are available and must be used when appropriate(except for arrays)
 
 **Hanson's data abstractions used and their purposes:**
@@ -40,20 +40,18 @@ filesofpix Assignment
 -  readaline.c and its header file:
     -  reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
 -  functions.c and its header file:
-    -  helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format as well as assembliny and interpretating the matrix of bytes
+    -  helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format as well as assemble and interpret the matrix of bytes
 -  restoration.c and its header file:
     -  the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
 
 **Architecture:**
 -  For readaline, we will be using a pointer to char called buffer to store the characters. Buffer stops receiving input when finding the endline character.
--  For the restoration part, we need 2 data structures: a matrix in numbers matrix_nums (a pointer to pointer to integer), which will represent the final, restored p2 pgm file, and a pointer to char, which will store Hanson's atoms. We prefer this implementation over a pointer to a pointer to char because Atoms allow pointer equality. Since the lines from the original file have been injected with the same sequence of characters, all atoms we store must be equal.
--  We will use the readaline function to read the corrupted file line by line. The input will be separated into 2 parts: matrix[i] (a pointer to int, where we store the numbers from the input line) and atoms[i] (where we store anything else). After every line iteration, we check if we found any 2 equal atoms (which should be easy considering atoms allow pointer equality). We repeat the process until we find 2 equal atoms, atoms[x] and atoms[y]. We delete all the lines from both data structures besides x and y.
--  Now that we know the correct sequence of characters with which the original lines have been injected, we simply need to check every corrupted line individually and store the numbers in matrix_nums if the sequence matches.
--  Once we have the correct sequence of lines along with the dimensions of the file, this sequence is passed to the conversion process and output to stdout as the PGM header with the magic number, dimensions, and max grayscale value followed by the content of the file expressed by single bites as opposed to individual character in the P2 format.
+-  Once the line is constructed, we check the injected sequence of characters (stored in atoms). When finding identical atoms, we store the appropriate numbers (converted to binary) inside a matrix (which is a sequence of sequences containing uint8_t values.
+-  Once we have the correct sequence of lines along with the dimensions of the file, we print the dimensions along with the matrix. This represents the P5 file.
 
 **Data structures used:**
 -  Seq_T atom_sequence: Represents a sequence of atoms. The first step is establishing the correct sequence of characters the original lines have been injected with. We add a new atom to the sequence until we find identical atoms.
--  Seq_T newRow: eepresenting a sequence of numbers
+-  Seq_T newRow: representing a sequence of numbers
 -  Seq_T matrix: representing a sequence of newRows
 
 **Implementations:**

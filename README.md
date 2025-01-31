@@ -15,10 +15,10 @@ filesofpix Assignment
 
 **Assumptions:**
 -  Input:
-  -    Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
-  -    Images are atleast a 2x2 grid
-  -    The input can come from both stdin or from a file
--  Corruption
+  -  Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
+  - Images are atleast a 2x2 grid
+  - The input can come from both stdin or from a file
+-  Corruption:
   -    The corrupted images originate from "plain" PGM files(P2)
   -    Each original row is terminated by a newline character (\n) that remains unchanged.
   -    Corruption does not alter the row order but adds extra rows
@@ -35,11 +35,14 @@ filesofpix Assignment
    -  they allow for atom equality, which is essential for comparing the injected sequences
    
 **File Descriptions:**
--  main.c: checks the type of input received and passes it on to the restoration function
--  readaline.c and its header file: reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
--  functions.c and its header file: represent helper functions for the restoration function
--  restoration.c and its header file: the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
--  conversion.c and its header file: helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format
+-  main.c:
+    -  checks the type of input received and passes it on to the restoration function
+-  readaline.c and its header file:
+    -  reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
+-  functions.c and its header file:
+    -  helper file that includes functions to convert the sequence of numbers to binary and write both the contents and header to a p5 format as well as assembliny and interpretating the matrix of bytes
+-  restoration.c and its header file:
+    -  the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
 
 **Architecture:**
 -  For readaline, we will be using a pointer to char called buffer to store the characters. Buffer stops receiving input when finding the endline character.
@@ -56,9 +59,9 @@ filesofpix Assignment
 **Implementations:**
 -  readaline:
     -  The readaline function reads characters one by one from the input file and stores them in a buffer (the buffer is allocated dynamically so that its size can change). The loop stops if it encounters the endline character or the end of the file. Then *datapp gets updated and the size of the buffer is returned. If the size is 0 (meaning we no characters have been read, and thus we reached the end of the line), the buffer is freed and the function returns 0
--  restoration
+-  restoration:
     -   this is the main function for handling of both decrypting and outputing the uncorruted pgm images. In this file we use readaline to process a corrupted file line by line, storing numbers in matrix_nums and characters in atoms, leveraging pointer equality to identify duplicate sequences. Once duplicates are found, we restore the original PGM file by filtering lines with the correct sequence, converting the data, and outputting it in PGM format with the appropriate header and binary content. 
--  WriteToBinaryt
+-  WriteToBinary:
     -  the writeToBinary function reads the characters from the sequence of characters and converts them to bytes that can outputted. This method is called multiple times over a conversion as it adds it to the correct matrix of btyes
   
 **Tests:**
